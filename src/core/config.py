@@ -25,7 +25,7 @@ class Settings(BaseSettings):
         case_sensitive=False,
         env_nested_delimiter='__',
         env_prefix='FASTAPI_CONFIG__',
-        env_file='.env',
+        env_file=('.env.template', '.env'),
     )
     run: RunConfig = RunConfig()
     api: APIPrefix = APIPrefix()
@@ -33,4 +33,3 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-print(settings.db.url)
