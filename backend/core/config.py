@@ -8,9 +8,17 @@ class RunConfig(BaseModel):
     port: int = 8000
 
 
-class APIPrefix(BaseModel):
+class ApiV1Prefix(BaseModel):
+    prefix: str = '/v1'
+    # add v1 blocks here
+    operations: str = '/operations'
+    # balance: str = '/balance'
+
+
+class ApiPrefix(BaseModel):
     prefix: str = '/api'
-    tags: list = ['Finance-accounting']
+    # add versions here
+    v1: ApiV1Prefix = ApiV1Prefix()
 
 
 class DataBaseConfig(BaseModel):
@@ -36,7 +44,7 @@ class Settings(BaseSettings):
         env_file=('.env.template', '.env'),
     )
     run: RunConfig = RunConfig()
-    api: APIPrefix = APIPrefix()
+    api: ApiPrefix = ApiPrefix()
     db: DataBaseConfig
 
 
