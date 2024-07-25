@@ -2,7 +2,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import Numeric, Date
 
 from core.models import Base
-from core.models.mixins.int_id_pk import IntIdPkMixin
+from core.models.mixins import IntIdPkMixin
 
 
 class ORMOperation(IntIdPkMixin, Base):
