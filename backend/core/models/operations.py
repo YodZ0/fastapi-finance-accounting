@@ -3,6 +3,7 @@ from sqlalchemy import Numeric, Date
 
 from core.models import Base
 from core.models.mixins import IntIdPkMixin
+from core.schemas import OperationBase
 
 
 class ORMOperation(IntIdPkMixin, Base):
@@ -11,3 +12,13 @@ class ORMOperation(IntIdPkMixin, Base):
     currency: Mapped[str]
     kind: Mapped[str]
     date: Mapped[str] = mapped_column(Date)
+
+    def to_read_model(self) -> OperationBase:
+        return OperationBase(
+            id=self.id,
+            title=self.title,
+            amount=self.amount,
+            currency=self.currency,
+            kind=self.kind,
+            date=self.date,
+        )
