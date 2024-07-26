@@ -1,19 +1,19 @@
 from enum import Enum
-from datetime import date
+import datetime
 
 from pydantic import BaseModel, Field
 
 
-class OperationKind(Enum):
-    INCOME = 'INCOME'
-    EXPENSE = 'EXPENSE'
+class OperationKind(str, Enum):
+    INCOME: str = 'INCOME'
+    EXPENSE: str = 'EXPENSE'
 
 
-class Currency(Enum):
-    KZT = 'KZT'
-    RUB = 'RUB'
-    USD = 'USD'
-    EUR = 'EUR'
+class Currency(str, Enum):
+    KZT: str = 'KZT'
+    RUB: str = 'RUB'
+    USD: str = 'USD'
+    EUR: str = 'EUR'
 
 
 class OperationBase(BaseModel):
@@ -22,11 +22,15 @@ class OperationBase(BaseModel):
     amount: float = Field(ge=0)
     currency: Currency
     kind: OperationKind
-    date: date = date.today
+    date: datetime.date = datetime.date.today
 
 
-class OperationCreate(OperationBase):
-    pass
+class OperationCreate(BaseModel):
+    title: str = Field(max_length=50)
+    amount: float = Field(ge=0)
+    currency: Currency
+    kind: OperationKind
+    date: datetime.date = datetime.date.today
 
 
 class OperationRead(OperationBase):
