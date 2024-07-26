@@ -48,3 +48,10 @@ db_helper = DataBaseHelper(
     max_overflow=settings.db.max_overflow,
     pool_size=settings.db.pool_size,
 )
+# The second way to make session
+async_session_maker: async_sessionmaker[AsyncSession] = async_sessionmaker(
+    bind=db_helper.engine,
+    autoflush=False,
+    autocommit=False,
+    expire_on_commit=False,
+)
