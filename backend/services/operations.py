@@ -1,16 +1,18 @@
-from core.schemas import OperationCreate, OperationRead, OperationBase
-from repositories import OperationsRepository
+from core.schemas import OperationCreate
+from utils.unit_of_work import UnitOfWork
 
 
 class OperationsService:
-    def __init__(self, operations_repo: type(OperationsRepository)):
-        self.operations_repo: OperationsRepository = operations_repo()
-
-    async def add_operation(self, operation: OperationCreate):
+    @staticmethod
+    async def add_operation(uow: UnitOfWork, operation: OperationCreate):
         operation_dict = operation.model_dump()
-        operation_id = await self.operations_repo.add_one(operation_dict)
-        return operation_id
+        async with uow:
+            operation_id = await uow.operations.add_one(data=operation_dict)
+            await uow.commit()
+            return operation_id
 
-    async def get_operations(self, **order_by):
-        operations = await self.operations_repo.find_all(**order_by)
-        return operations
+    @staticmethod
+    async def get_operations(uow: UnitOfWork):
+        async with uow:
+            operations = await uow.operations.find_all()
+            return operations
