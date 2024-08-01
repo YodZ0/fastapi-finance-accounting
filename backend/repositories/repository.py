@@ -1,9 +1,8 @@
 from abc import ABC, abstractmethod
 
-from sqlalchemy.sql import select
+from sqlalchemy import insert, select, update
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import insert
-
-from core.models.database import async_session_maker
 
 
 class AbstractRepository(ABC):
@@ -20,17 +19,27 @@ class AbstractRepository(ABC):
 class SQLAlchemyRepository(AbstractRepository):
     model = None
 
-    async def add_one(self, data: dict):
-        async with async_session_maker() as session:
-            # stmt = insert(self.model).values(**data).returning(self.model.id)
-            stmt = insert(self.model).values(**data)
-            result = await session.execute(stmt)
-            await session.commit()
-            return result.scalar_one()
+    def __init__(self, session: AsyncSession):
+        self.session = session
 
-    async def find_all(self, **order_by):
-        async with async_session_maker() as session:
-            stmt = select(self.model).order_by(self.model.id.desc())
-            result = await session.execute(stmt)
-            result = [row[0].to_read_model() for row in result.all()]
-            return result
+    async def add_one(self, data: dict) -> int:
+        stmt = insert(self.model).values(**data).returning(self.model.id)
+        res = await self.session.execute(stmt)
+        return res.scalar_one()
+
+    async def edit_one(self, _id: int, data: dict) -> int:
+        stmt = update(self.model).values(**data).filter_by(id=_id).returning(self.model.id)
+        res = await self.session.execute(stmt)
+        return res.scalar_one()
+
+    async def find_one(self, **filter_by):
+        stmt = select(self.model).filter_by(**filter_by)
+        res = await self.session.execute(stmt)
+        res = res.scalar_one().to_read_model()
+        return res
+
+    async def find_all(self, offset: int = 0, limit: int = 10):
+        stmt = select(self.model).offset(offset).limit(limit)
+        res = await self.session.execute(stmt)
+        res = [row[0].to_read_model() for row in res.all()]
+        return res
