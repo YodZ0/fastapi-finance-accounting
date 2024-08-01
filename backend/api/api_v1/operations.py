@@ -1,26 +1,24 @@
-from typing import Annotated
-
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 
 from services.operations import OperationsService
 from core.schemas import OperationRead, OperationCreate
-from .dependencies import operations_service
+from .dependencies import UOWDep
 
 router = APIRouter()
 
 
 @router.get('')
-async def get_operations_list(
-        service: Annotated[OperationsService, Depends(operations_service)],
+async def get_operations(
+        uow: UOWDep,
 ) -> list[OperationRead]:
-    operations = await service.get_operations()
+    operations = await OperationsService().get_operations(uow)
     return operations
 
 
 @router.post('')
-async def add_new_operation(
+async def add_operation(
         operation: OperationCreate,
-        service: Annotated[OperationsService, Depends(operations_service)],
-):
-    operation_id = await service.add_operation(operation)
-    return {'operation_id': operation_id}
+        uow: UOWDep,
+) -> dict:
+    operation_id = await OperationsService().add_operation(uow, operation)
+    return {'operation_id': str(operation_id), 'status': '201', 'message': 'Created'}

@@ -1,6 +1,7 @@
-from repositories.operations import OperationsRepository
-from services.operations import OperationsService
+from typing import Annotated
 
+from fastapi import Depends
 
-async def operations_service():
-    return OperationsService(OperationsRepository)
+from utils.unit_of_work import IUnitOfWork, UnitOfWork
+
+UOWDep = Annotated[IUnitOfWork, Depends(UnitOfWork)]
