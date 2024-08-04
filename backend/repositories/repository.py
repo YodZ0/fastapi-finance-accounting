@@ -38,8 +38,22 @@ class SQLAlchemyRepository(AbstractRepository):
         res = res.scalar_one().to_read_model()
         return res
 
-    async def find_all(self, offset: int = 0, limit: int = 10):
+    async def find_all(self, offset: int = None, limit: int = None):
         stmt = select(self.model).offset(offset).limit(limit)
         res = await self.session.execute(stmt)
         res = [row[0].to_read_model() for row in res.all()]
+        return res
+
+    async def filter_all(self, currency: str = None, period: dict[str, str] = None, kind: str = None):
+        stmt = select(self.model)
+
+        if currency is not None:
+            stmt = stmt.where(self.model.currency == currency)
+        if period is not None:
+            stmt = stmt.filter(self.model.date.between(period['start'], period['end']))
+        if kind is not None:
+            stmt = stmt.where(self.model.kind == kind)
+
+        result = await self.session.execute(stmt)
+        res = [row[0].to_read_model() for row in result.all()]
         return res
