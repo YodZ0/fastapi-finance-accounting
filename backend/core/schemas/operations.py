@@ -1,5 +1,6 @@
 from enum import Enum
 import datetime
+from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -31,6 +32,13 @@ class OperationCreate(BaseModel):
     currency: Currency
     kind: OperationKind
     date: datetime.date = datetime.date.today
+
+
+class OperationFilter(BaseModel):
+    currency: Optional[Currency] = None
+    kind: Optional[OperationKind] = None
+    date_start: Optional[datetime.date] = None
+    date_end: Optional[datetime.date] = None
 
 
 class OperationRead(OperationBase):
