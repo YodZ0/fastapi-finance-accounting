@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import Numeric, Date
 
@@ -11,7 +13,7 @@ class ORMOperation(IntIdPkMixin, Base):
     amount: Mapped[float] = mapped_column(Numeric(10, 2))
     currency: Mapped[str]
     kind: Mapped[str]
-    date: Mapped[str] = mapped_column(Date)
+    date: Mapped[datetime.date] = mapped_column(Date)
 
     def to_read_model(self) -> OperationBase:
         return OperationBase(
