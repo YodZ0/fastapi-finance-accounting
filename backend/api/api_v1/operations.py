@@ -32,12 +32,14 @@ async def filter_operations(
         uow: UOWDep,
         currency: str = None,
         kind: str = None,
+        category: str = None,
         date_start: str = None,
         date_end: str = None,
 ):
     filters = OperationFilter(
         currency=currency,
         kind=kind,
+        category=category,
         date_start=date_start,
         date_end=date_end
     )
