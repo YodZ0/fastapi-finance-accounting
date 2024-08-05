@@ -29,7 +29,14 @@ class OperationsService:
             }
         else:
             period = None
+
         kind = filters_dict['kind']
+        category = filters_dict['category']
         async with uow:
-            operations = await uow.operations.filter_all(currency=currency, period=period, kind=kind)
+            operations = await uow.operations.filter_all(
+                currency=currency,
+                period=period,
+                kind=kind,
+                category=category
+            )
             return operations
