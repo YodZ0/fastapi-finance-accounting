@@ -44,7 +44,12 @@ class SQLAlchemyRepository(AbstractRepository):
         res = [row[0].to_read_model() for row in res.all()]
         return res
 
-    async def filter_all(self, currency: str = None, period: dict[str, str] = None, kind: str = None):
+    async def filter_all(
+            self, currency: str = None,
+            period: dict[str, str] = None,
+            kind: str = None,
+            category: str = None,
+    ):
         stmt = select(self.model)
 
         if currency is not None:
@@ -53,6 +58,8 @@ class SQLAlchemyRepository(AbstractRepository):
             stmt = stmt.filter(self.model.date.between(period['start'], period['end']))
         if kind is not None:
             stmt = stmt.where(self.model.kind == kind)
+        if category is not None:
+            stmt = stmt.where(self.model.category == category)
 
         result = await self.session.execute(stmt)
         res = [row[0].to_read_model() for row in result.all()]
