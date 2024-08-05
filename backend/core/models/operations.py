@@ -13,6 +13,7 @@ class ORMOperation(IntIdPkMixin, Base):
     amount: Mapped[float] = mapped_column(Numeric(10, 2))
     currency: Mapped[str]
     kind: Mapped[str]
+    category: Mapped[str]
     date: Mapped[datetime.date] = mapped_column(Date)
 
     def to_read_model(self) -> OperationBase:
@@ -22,5 +23,6 @@ class ORMOperation(IntIdPkMixin, Base):
             amount=self.amount,
             currency=self.currency,
             kind=self.kind,
+            category=self.category,
             date=self.date,
         )
