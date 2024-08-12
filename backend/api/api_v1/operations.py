@@ -8,14 +8,31 @@ from .dependencies import UOWDep
 router = APIRouter()
 
 
-@router.post('')
+@router.post('/add')
 async def add_operation(
         uow: UOWDep,
         operation: OperationCreate,
 ) -> dict:
     operation_id = await OperationsService().add_operation(uow, operation)
-    return {'operation_id': str(operation_id), 'status': '201', 'message': 'Created'}
+    return {'operation_id': str(operation_id), 'message': 'Created', 'status_code': '201'}
 
+
+@router.delete('/delete/{operation_id}')
+async def delete_operation(uow: UOWDep, operation_id: int) -> dict:
+    operation_id = await OperationsService().delete_operation(uow, operation_id=operation_id)
+    if operation_id is not None:
+        return {'deleted': str(operation_id), 'status_code': '200'}
+    else:
+        return {'message': 'Operation not found', 'status_code': '404'}
+
+
+@router.post('/delete-multiple')
+async def delete_multiple_operations(uow: UOWDep, operations_ids: list[int]) -> dict:
+    operations_ids = await OperationsService().delete_multiple_operations(uow, operations_ids=operations_ids)
+    if operations_ids:
+        return {'deleted': str(operations_ids), 'status_code': '200'}
+    else:
+        return {'message': 'Operations not found', 'status_code': '404'}
 
 @router.get('')
 async def get_all_operations(
