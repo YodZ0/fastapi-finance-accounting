@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from core.schemas import OperationRead, OperationCreate, OperationFilter
 from services.operations import OperationsService
 from core.schemas import OperationRead, OperationCreate, OperationFilter
 from .dependencies import UOWDep
@@ -34,17 +35,19 @@ async def delete_multiple_operations(uow: UOWDep, operations_ids: list[int]) -> 
     else:
         return {'message': 'Operations not found', 'status_code': '404'}
 
-@router.get('')
+
+@router.get('', response_model=list[OperationRead])
 async def get_all_operations(
         uow: UOWDep,
+        limit: int = None,
         offset: int = None,
         limit: int = None,
 ) -> list[OperationRead]:
-    operations = await OperationsService().get_all_operations(uow, offset=offset, limit=limit)
+    operations = await OperationsService().get_all_operations(uow, limit=limit, offset=offset)
     return operations
 
 
-@router.get('/filter')
+@router.get('/filter', response_model=list[OperationRead])
 async def filter_operations(
         uow: UOWDep,
         currency: str = None,
@@ -52,7 +55,7 @@ async def filter_operations(
         category: str = None,
         date_start: str = None,
         date_end: str = None,
-):
+) -> list[OperationRead]:
     filters = OperationFilter(
         currency=currency,
         kind=kind,
@@ -62,3 +65,19 @@ async def filter_operations(
     )
     operations = await OperationsService().filter_operations(uow, filters)
     return operations
+
+
+@router.get('/diagrams')
+async def get_diagram_data(
+        uow: UOWDep,
+        currency: str = None,
+        date_start: str = None,
+        date_end: str = None,
+) -> dict:
+    filters = OperationFilter(
+        currency=currency,
+        date_start=date_start,
+        date_end=date_end
+    )
+    diagram_data = await OperationsService().get_diagram_data(uow, filters)
+    return diagram_data

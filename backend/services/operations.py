@@ -54,3 +54,59 @@ class OperationsService:
                 category=category
             )
             return operations
+
+    @staticmethod
+    async def get_diagram_data(uow: UnitOfWork, filters: OperationFilter = None):
+        filters_dict = filters.model_dump()
+        currency = filters_dict['currency']
+
+        if filters_dict['date_start'] is not None:
+            period = {
+                'start': filters_dict['date_start'],
+                'end': filters_dict['date_end'],
+            }
+        else:
+            period = None
+
+        async with uow:
+            inc_cat_amount_dict = defaultdict(float)
+            exp_cat_amount_dict = defaultdict(float)
+            operations: list[OperationBase] = await uow.operations.filter_all(
+                currency=currency,
+                period=period,
+            )
+
+            incomes_values = []
+            expenses_values = []
+            for operation in operations:
+                if operation.kind.name == 'INCOME':
+                    inc_cat_amount_dict[operation.category.name] += operation.amount
+                else:
+                    exp_cat_amount_dict[operation.category.name] += operation.amount
+
+            total_inc = 0
+            for item, value in inc_cat_amount_dict.items():
+                total_inc += value
+                incomes_values.append(
+                    {'type': item, 'value': value}
+                )
+
+            total_exp = 0
+            for item, value in exp_cat_amount_dict.items():
+                total_exp += value
+                expenses_values.append(
+                    {'type': item, 'value': value}
+                )
+
+            data = {
+                'incomes': {
+                    'title': f'Income, {filters.currency.name}\n{total_inc}',
+                    'values': incomes_values,
+                },
+                'expenses': {
+                    'title': f'Expense, {filters.currency.name}\n{total_exp}',
+                    'values': expenses_values,
+                },
+            }
+
+            return data
