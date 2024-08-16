@@ -310,10 +310,10 @@ class OperationsService:
                 'start': filters_dict['date_start'],
                 'end': filters_dict['date_end'],
             }
-            filename = f'export_{period['start']}__{period['end']}.csv'
+            filename = f'export_{period['start']}__{period['end']}_{currency}.csv'
         else:
             period = None
-            filename = f'export_all_operations.csv'
+            filename = f'export_all_operations_{currency}.csv'
 
         file_location = settings.media_dir / 'export' / filename
 
