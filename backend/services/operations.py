@@ -1,6 +1,8 @@
 from core.schemas import OperationCreate, OperationFilter
 from utils.unit_of_work import UnitOfWork
 
+from collections import defaultdict
+
 
 class OperationsService:
     @staticmethod
@@ -88,24 +90,39 @@ class OperationsService:
             for item, value in inc_cat_amount_dict.items():
                 total_inc += value
                 incomes_values.append(
-                    {'type': item, 'value': value}
+                    {'type': item, 'value': round(value, 2)}
                 )
 
             total_exp = 0
             for item, value in exp_cat_amount_dict.items():
                 total_exp += value
                 expenses_values.append(
-                    {'type': item, 'value': value}
+                    {'type': item, 'value': round(value, 2)}
                 )
+
+            total = total_inc + total_exp
+            if total != 0:
+                inc_proportion = round(total_inc * 100 / total, 2)
+                exp_proportion = round(total_exp * 100 / total, 2)
+            else:
+                inc_proportion = 0
+                exp_proportion = 0
 
             data = {
                 'incomes': {
-                    'title': f'Income, {filters.currency.name}\n{total_inc}',
+                    'title': f'Income, {filters.currency.name}\n{round(total_inc, 2)}',
                     'values': incomes_values,
                 },
                 'expenses': {
-                    'title': f'Expense, {filters.currency.name}\n{total_exp}',
+                    'title': f'Expense, {filters.currency.name}\n{round(total_exp, 2)}',
                     'values': expenses_values,
+                },
+                'proportions': {
+                    'title': f'% Total, {filters.currency.name}',
+                    'values': [
+                        {'type': '% Incomes', 'value': inc_proportion},
+                        {'type': '% Expenses', 'value': exp_proportion},
+                    ],
                 },
             }
 
