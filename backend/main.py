@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 
 import uvicorn
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from api import router as api_router
@@ -21,6 +22,8 @@ async def lifespan(app: FastAPI):
 
 main_app = FastAPI(lifespan=lifespan)
 main_app.include_router(api_router)
+
+main_app.mount("/media", StaticFiles(directory=settings.media_dir), name="media")
 
 origins = [
     "http://localhost:5173",
