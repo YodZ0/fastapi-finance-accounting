@@ -39,6 +39,12 @@ class SQLAlchemyRepository(AbstractRepository):
         res = await self.session.execute(stmt)
         return res.scalar_one()
 
+    async def add_multiple(self, data: list[dict]) -> list:
+        stmt = insert(self.model).values(data).returning(self.model.id)
+        res = await self.session.execute(stmt)
+        res = [row[0] for row in res]
+        return res
+
     async def edit_one(self, _id: int, data: dict) -> int:
         stmt = update(self.model).values(**data).filter_by(id=_id).returning(self.model.id)
         res = await self.session.execute(stmt)
