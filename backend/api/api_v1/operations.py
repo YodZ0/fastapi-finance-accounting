@@ -1,6 +1,8 @@
 from fastapi import APIRouter
+import datetime
 
 from core.schemas import OperationRead, OperationCreate, OperationFilter
+from core.schemas.operations import Currency, OperationKind, IncomeCategories, ExpenseCategories
 from services.operations import OperationsService
 from core.schemas import OperationRead, OperationCreate, OperationFilter
 from .dependencies import UOWDep
@@ -19,7 +21,10 @@ async def add_operation(
 
 
 @router.delete('/delete/{operation_id}')
-async def delete_operation(uow: UOWDep, operation_id: int) -> dict:
+async def delete_operation(
+        uow: UOWDep,
+        operation_id: int
+) -> dict:
     operation_id = await OperationsService().delete_operation(uow, operation_id=operation_id)
     if operation_id is not None:
         return {'deleted': str(operation_id), 'status_code': '200'}
@@ -28,7 +33,10 @@ async def delete_operation(uow: UOWDep, operation_id: int) -> dict:
 
 
 @router.post('/delete-multiple')
-async def delete_multiple_operations(uow: UOWDep, operations_ids: list[int]) -> dict:
+async def delete_multiple_operations(
+        uow: UOWDep,
+        operations_ids: list[int]
+) -> dict:
     operations_ids = await OperationsService().delete_multiple_operations(uow, operations_ids=operations_ids)
     if operations_ids:
         return {'deleted': str(operations_ids), 'status_code': '200'}
@@ -41,7 +49,6 @@ async def get_all_operations(
         uow: UOWDep,
         limit: int = None,
         offset: int = None,
-        limit: int = None,
 ) -> list[OperationRead]:
     operations = await OperationsService().get_all_operations(uow, limit=limit, offset=offset)
     return operations
@@ -52,9 +59,11 @@ async def filter_operations(
         uow: UOWDep,
         currency: str = None,
         kind: str = None,
+        currency: Currency = None,
+        kind: OperationKind = None,
         category: str = None,
-        date_start: str = None,
-        date_end: str = None,
+        date_start: datetime.date = None,
+        date_end: datetime.date = None,
 ) -> list[OperationRead]:
     filters = OperationFilter(
         currency=currency,
@@ -70,9 +79,9 @@ async def filter_operations(
 @router.get('/diagrams')
 async def get_diagram_data(
         uow: UOWDep,
-        currency: str = None,
-        date_start: str = None,
-        date_end: str = None,
+        currency: Currency,
+        date_start: datetime.date = None,
+        date_end: datetime.date = None,
 ) -> dict:
     filters = OperationFilter(
         currency=currency,
