@@ -153,7 +153,6 @@ class OperationsService:
             return operations
 
     @staticmethod
-    async def get_diagram_data(uow: UnitOfWork, filters: OperationFilter = None):
     async def get_diagram_data(
             uow: UnitOfWork,
             filters: OperationFilter = None,
