@@ -21,6 +21,14 @@ class OperationsService:
             return operation_id
 
     @staticmethod
+    async def add_multiple_operations(uow: UnitOfWork, operations: list[OperationCreate]):
+        data = [operation.model_dump() for operation in operations]
+        async with uow:
+            operations_ids = await uow.operations.add_multiple(data=data)
+            await uow.commit()
+            return operations_ids
+
+    @staticmethod
     async def delete_operation(uow: UnitOfWork, operation_id: int) -> int | None:
         async with uow:
             operation_id = await uow.operations.delete_one(_id=operation_id)
