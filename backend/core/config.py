@@ -1,6 +1,13 @@
+from pathlib import Path
+
 from pydantic import BaseModel
 from pydantic import PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+MEDIA_DIR = BASE_DIR / 'media'
 
 
 class RunConfig(BaseModel):
@@ -46,6 +53,8 @@ class Settings(BaseSettings):
     run: RunConfig = RunConfig()
     api: ApiPrefix = ApiPrefix()
     db: DataBaseConfig
+    base_dir: Path = BASE_DIR
+    media_dir: Path = MEDIA_DIR
 
 
 settings = Settings()

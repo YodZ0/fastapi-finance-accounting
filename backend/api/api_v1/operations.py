@@ -1,10 +1,12 @@
-from fastapi import APIRouter
 import datetime
+from typing import Annotated
+
+from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi.responses import FileResponse
 
 from core.schemas import OperationRead, OperationCreate, OperationFilter
 from core.schemas.operations import Currency, OperationKind, IncomeCategories, ExpenseCategories
 from services.operations import OperationsService
-from core.schemas import OperationRead, OperationCreate, OperationFilter
 from .dependencies import UOWDep
 
 # api_v1 url = ..api/v1/operations/
@@ -57,8 +59,6 @@ async def get_all_operations(
 @router.get('/filter', response_model=list[OperationRead])
 async def filter_operations(
         uow: UOWDep,
-        currency: str = None,
-        kind: str = None,
         currency: Currency = None,
         kind: OperationKind = None,
         category: str = None,
@@ -90,3 +90,34 @@ async def get_diagram_data(
     )
     diagram_data = await OperationsService().get_diagram_data(uow, filters)
     return diagram_data
+
+
+@router.post('/file')
+async def upload_file(
+        uow: UOWDep,
+        file: Annotated[UploadFile, File(description='Allowed formats: .txt, .csv')]
+):
+    allowed_formats = ['csv', 'plain']
+    file_format = file.headers['content-type'].split('/')[1]
+
+    if file_format in allowed_formats:
+        operations_ids = await OperationsService().create_operations_from_file(uow, file, file_format)
+        return {'created': str(operations_ids), 'status_code': '201'}
+    else:
+        return HTTPException(status_code=403, detail=f"Invalid file format: '{file_format}'. Allowed: .csv, .txt")
+
+
+@router.get('/file/download', response_description='Download operations csv file.')
+async def download_csv_file(
+        uow: UOWDep,
+        currency: Currency = None,
+        date_start: datetime.date = None,
+        date_end: datetime.date = None,
+) -> FileResponse:
+    filters = OperationFilter(
+        currency=currency,
+        date_start=date_start,
+        date_end=date_end
+    )
+    file = await OperationsService().send_operations_csv_file(uow, filters)
+    return file

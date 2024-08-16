@@ -1,4 +1,11 @@
-from core.schemas import OperationCreate, OperationFilter
+from datetime import datetime
+
+from fastapi.responses import FileResponse
+
+from core.config import settings
+from core.schemas import OperationCreate, OperationFilter, OperationBase
+
+from utils.file_handler import read_line_from_txt_file, read_from_csv, write_to_csv
 from utils.unit_of_work import UnitOfWork
 
 from collections import defaultdict
@@ -127,3 +134,57 @@ class OperationsService:
             }
 
             return data
+
+    @staticmethod
+    async def create_operations_from_file(uow: UnitOfWork, file, file_format):
+        file_location = settings.media_dir / 'uploads' / file.filename
+
+        async with uow:
+            with open(file_location, 'wb') as f:
+                f.write(await file.read())
+
+            if file_format == 'csv':
+                gen = read_from_csv(file_location)
+                new_operations = []
+                for line in gen:
+                    if 'id' in line:
+                        del line['id']
+
+                    line['amount'] = float(line['amount'])
+                    line['date'] = datetime.strptime(line['date'], '%d.%m.%Y').date()
+                    new_operations.append(line)
+
+                operations_ids = await uow.operations.add_multiple(data=new_operations)
+                await uow.commit()
+                return operations_ids
+            elif file_format == 'plain':
+                gen = read_line_from_txt_file(file_location)
+            else:
+                return None
+
+    @staticmethod
+    async def send_operations_csv_file(uow: UnitOfWork, filters: OperationFilter = None) -> FileResponse:
+        filters_dict = filters.model_dump()
+        currency = filters_dict['currency']
+
+        if filters_dict['date_start'] is not None:
+            period = {
+                'start': filters_dict['date_start'],
+                'end': filters_dict['date_end'],
+            }
+            filename = f'Operations__{period['start']}__{period['end']}.csv'
+        else:
+            period = None
+            filename = f'All__operations.csv'
+
+        file_location = settings.media_dir / 'downloads' / filename
+
+        async with uow:
+            operations: list[OperationBase] = await uow.operations.filter_all(
+                currency=currency,
+                period=period,
+            )
+            data = [operation.model_dump() for operation in operations]
+            write_to_csv(data, file_location)
+
+        return FileResponse(path=file_location, filename=filename, media_type='multipart/form-data')
