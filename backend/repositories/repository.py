@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from sqlalchemy import insert, select, update, delete
+from sqlalchemy import insert, select, update, delete, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import insert
 
@@ -68,7 +68,7 @@ class SQLAlchemyRepository(AbstractRepository):
         return res
 
     async def find_all(self, limit: int = None, offset: int = None):
-        stmt = select(self.model).limit(limit).offset(offset)
+        stmt = select(self.model).order_by(desc(self.model.date)).limit(limit).offset(offset)
         res = await self.session.execute(stmt)
         res = [row[0].to_read_model() for row in res.all()]
         return res
@@ -80,7 +80,7 @@ class SQLAlchemyRepository(AbstractRepository):
             kind: str = None,
             category: str = None,
     ):
-        stmt = select(self.model)
+        stmt = select(self.model).order_by(desc(self.model.date))
 
         if currency is not None:
             stmt = stmt.where(self.model.currency == currency)
