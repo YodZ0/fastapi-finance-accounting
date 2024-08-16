@@ -137,7 +137,7 @@ class OperationsService:
 
     @staticmethod
     async def create_operations_from_file(uow: UnitOfWork, file, file_format):
-        file_location = settings.media_dir / 'uploads' / file.filename
+        file_location = settings.media_dir / 'import' / file.filename
 
         async with uow:
             with open(file_location, 'wb') as f:
@@ -177,7 +177,7 @@ class OperationsService:
             period = None
             filename = f'All__operations.csv'
 
-        file_location = settings.media_dir / 'downloads' / filename
+        file_location = settings.media_dir / 'export' / filename
 
         async with uow:
             operations: list[OperationBase] = await uow.operations.filter_all(
