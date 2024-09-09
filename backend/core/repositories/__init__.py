@@ -1,7 +1,7 @@
 __all__ = [
     'AbstractRepository',
-    'OperationsRepository',
+    'SQLAlchemyRepository',
 ]
 
 from .repository import AbstractRepository
-from .operations import OperationsRepository
+from .sqla_repository import SQLAlchemyRepository

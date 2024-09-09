@@ -1,7 +1,9 @@
 from fastapi import APIRouter
 
 from core.config import settings
-from .operations import router as operations_router
+
+from modules.categories.routers import router as category_router
+from modules.roles.routers import router as role_router
 
 # Main API V1 router
 router = APIRouter(
@@ -10,7 +12,12 @@ router = APIRouter(
 
 # Add api_v1 routers here
 router.include_router(
-    operations_router,
-    prefix=settings.api.v1.operations,
-    tags=['Operations'],
+    category_router,
+    prefix=settings.api.v1.categories,
+    tags=['Categories'],
+)
+router.include_router(
+    role_router,
+    prefix=settings.api.v1.roles,
+    tags=['Roles'],
 )

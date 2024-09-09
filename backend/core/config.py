@@ -18,8 +18,8 @@ class RunConfig(BaseModel):
 class ApiV1Prefix(BaseModel):
     prefix: str = '/v1'
     # add v1 blocks here
-    operations: str = '/operations'
-    # balance: str = '/balance'
+    categories: str = '/categories'
+    roles: str = '/roles'
 
 
 class ApiPrefix(BaseModel):
@@ -53,8 +53,8 @@ class Settings(BaseSettings):
     run: RunConfig = RunConfig()
     api: ApiPrefix = ApiPrefix()
     db: DataBaseConfig
-    base_dir: Path = BASE_DIR
-    media_dir: Path = MEDIA_DIR
+    base_dir: Path = BASE_DIR  # ..\fastapi-finance-accounting\backend
+    media_dir: Path = MEDIA_DIR  # ..\fastapi-finance-accounting\backend\media
 
 
 settings = Settings()
