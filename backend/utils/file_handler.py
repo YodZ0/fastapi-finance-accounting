@@ -22,9 +22,9 @@ def read_from_csv(file_location):
 
 
 def write_to_csv(data: list[dict], file_location: str):
-    fieldnames = ['id', 'title', 'amount', 'currency', 'kind', 'category', 'date']
+    fieldnames = ['id', 'title', 'amount', 'currency', 'type', 'category', 'date']
     try:
-        with open(file_location, mode='r', newline='', encoding='utf-8') as file:
+        with open(file_location, mode='w', newline='', encoding='utf-8') as file:
             writer = csv.DictWriter(file, fieldnames=fieldnames)
             if file.tell() == 0:
                 writer.writeheader()
@@ -35,7 +35,7 @@ def write_to_csv(data: list[dict], file_location: str):
                     'title': item['title'],
                     'amount': item['amount'],
                     'currency': item['currency'],
-                    'kind': item['kind'],
+                    'type': 'Income' if item['is_income'] else 'Expense',
                     'category': item['category'],
                     'date': item['date']
                 })

@@ -1,4 +1,4 @@
-from .models import ORMCategory
+from core.models.category import ORMCategory
 from core.repositories import SQLAlchemyRepository
 
 

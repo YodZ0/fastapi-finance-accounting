@@ -1,10 +1,16 @@
 from abc import ABC, abstractmethod
-from sqlalchemy.exc import IntegrityError, OperationalError, DataError, ProgrammingError, DatabaseError
+from sqlalchemy.exc import (
+    IntegrityError,
+    OperationalError,
+    DataError,
+    ProgrammingError,
+    DatabaseError,
+)
 
-from core.models.database import async_session_maker
+from core.models import db_helper
 
-from modules.categories.repository import CategoriesRepository
-from modules.roles.repository import RolesRepository
+from core.repositories.category import CategoriesRepository
+from core.repositories.role import RolesRepository
 
 
 class IUnitOfWork(ABC):
@@ -12,29 +18,24 @@ class IUnitOfWork(ABC):
     roles: RolesRepository
 
     @abstractmethod
-    def __init__(self):
-        ...
+    def __init__(self): ...
 
     @abstractmethod
-    async def __aenter__(self):
-        ...
+    async def __aenter__(self): ...
 
     @abstractmethod
-    async def __aexit__(self, *args):
-        ...
+    async def __aexit__(self, *args): ...
 
     @abstractmethod
-    async def commit(self):
-        ...
+    async def commit(self): ...
 
     @abstractmethod
-    async def rollback(self):
-        ...
+    async def rollback(self): ...
 
 
 class UnitOfWork(IUnitOfWork):
     def __init__(self):
-        self.session_factory = async_session_maker
+        self.session_factory = db_helper.session_factory
 
     async def __aenter__(self):
         async with self.session_factory() as session:
@@ -56,27 +57,27 @@ class UnitOfWork(IUnitOfWork):
                 await self.session.commit()
         except IntegrityError as e:
             await self.rollback()
-            print(f'IntegrityError occurred: {e}')
+            print(f"IntegrityError occurred: {e}")
             raise
         except OperationalError as e:
             await self.rollback()
-            print(f'OperationalError occurred: {e}')
+            print(f"OperationalError occurred: {e}")
             raise
         except DataError as e:
             await self.rollback()
-            print(f'DataError occurred: {e}')
+            print(f"DataError occurred: {e}")
             raise
         except ProgrammingError as e:
             await self.rollback()
-            print(f'ProgrammingError occurred: {e}')
+            print(f"ProgrammingError occurred: {e}")
             raise
         except DatabaseError as e:
             await self.rollback()
-            print(f'DatabaseError occurred: {e}')
+            print(f"DatabaseError occurred: {e}")
             raise
         except Exception as e:
             await self.rollback()
-            print(f'An unexpected error occurred: {e}')
+            print(f"An unexpected error occurred: {e}")
             raise
 
     async def rollback(self):

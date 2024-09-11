@@ -7,30 +7,38 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-MEDIA_DIR = BASE_DIR / 'media'
+MEDIA_DIR = BASE_DIR / "media"
 
 
 class RunConfig(BaseModel):
-    host: str = '127.0.0.1'
+    host: str = "127.0.0.1"
     port: int = 8000
 
 
 class ApiV1Prefix(BaseModel):
-    prefix: str = '/v1'
+    prefix: str = "/v1"
     # add v1 blocks here
-    categories: str = '/categories'
-    roles: str = '/roles'
+    auth: str = "/auth"
+    users: str = "/users"
+    categories: str = "/categories"
+    roles: str = "/roles"
 
 
 class ApiPrefix(BaseModel):
-    prefix: str = '/api'
+    prefix: str = "/api"
     # add versions here
     v1: ApiV1Prefix = ApiV1Prefix()
+
+    @property
+    def bearer_token_url(self) -> str:
+        parts = (self.prefix, self.v1.prefix, self.v1.auth, "/login")
+        path = "".join(parts)
+        return path.removeprefix("/")
 
 
 class DataBaseConfig(BaseModel):
     url: PostgresDsn
-    echo: bool = False
+    echo: bool
     echo_pool: bool = False
     max_overflow: int = 10
     pool_size: int = 50
@@ -43,16 +51,23 @@ class DataBaseConfig(BaseModel):
     }
 
 
+class AccessTokenConfig(BaseModel):
+    lifetime_seconds: int = 3600
+    reset_password_token_secret: str
+    verification_token_secret: str
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         case_sensitive=False,
-        env_nested_delimiter='__',
-        env_prefix='FASTAPI_CONFIG__',
-        env_file=('.env.template', '.env'),
+        env_nested_delimiter="__",
+        env_prefix="APP_CONFIG__",
+        env_file=(".env.template", ".env"),
     )
     run: RunConfig = RunConfig()
     api: ApiPrefix = ApiPrefix()
     db: DataBaseConfig
+    access_token: AccessTokenConfig
     base_dir: Path = BASE_DIR  # ..\fastapi-finance-accounting\backend
     media_dir: Path = MEDIA_DIR  # ..\fastapi-finance-accounting\backend\media
 

@@ -1,4 +1,4 @@
-from .models import ORMRole
+from core.models.role import ORMRole
 from core.repositories import SQLAlchemyRepository
 
 

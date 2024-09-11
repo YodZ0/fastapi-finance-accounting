@@ -1,6 +1,6 @@
 from sqlalchemy.exc import IntegrityError
 
-from .schemas import CategoryCreate, Category, CategoryType
+from core.schemas.category import CategoryCreate, Category, CategoryType
 from utils.unit_of_work import UnitOfWork
 
 

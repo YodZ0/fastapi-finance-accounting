@@ -12,12 +12,12 @@ from core.config import settings
 
 class DataBaseHelper:
     def __init__(
-            self,
-            url: str,
-            echo: bool = False,
-            echo_pool: bool = False,
-            max_overflow: int = 10,
-            pool_size: int = 5,
+        self,
+        url: str,
+        echo: bool = False,
+        echo_pool: bool = False,
+        max_overflow: int = 10,
+        pool_size: int = 5,
     ) -> None:
         self.engine: AsyncEngine = create_async_engine(
             url=url,
@@ -47,11 +47,4 @@ db_helper = DataBaseHelper(
     echo_pool=settings.db.echo_pool,
     max_overflow=settings.db.max_overflow,
     pool_size=settings.db.pool_size,
-)
-# The second way to make session
-async_session_maker: async_sessionmaker[AsyncSession] = async_sessionmaker(
-    bind=db_helper.engine,
-    autoflush=False,
-    autocommit=False,
-    expire_on_commit=False,
 )

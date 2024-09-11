@@ -1,6 +1,6 @@
 from sqlalchemy.exc import IntegrityError
 
-from .schemas import RoleCreate, Role
+from core.schemas.role import RoleCreate, Role
 from utils.unit_of_work import UnitOfWork
 
 
