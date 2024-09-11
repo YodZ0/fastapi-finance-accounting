@@ -1,11 +1,12 @@
 from contextlib import asynccontextmanager
 
-import uvicorn
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
+from actions.create_superuser import create_superuser
 from api import router as api_router
+
 from core.config import settings
 from core.models.database import db_helper
 
@@ -14,6 +15,7 @@ from core.models.database import db_helper
 async def lifespan(app: FastAPI):
     # startup
     print('App started...')
+    await create_superuser()
     yield
     # shutdown
     print('Dispose engine...')
@@ -38,9 +40,11 @@ main_app.add_middleware(
     allow_headers=["*"],
 )
 
-if __name__ == '__main__':
+if __name__ == "__main__":
+    import uvicorn
+
     uvicorn.run(
-        app='main:main_app',
+        app="main:main_app",
         host=settings.run.host,
         port=settings.run.port,
         reload=True,
