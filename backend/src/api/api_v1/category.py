@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, status
 
 from sqlalchemy.exc import IntegrityError
 
@@ -13,7 +13,8 @@ router = APIRouter()
 
 @router.post(
     "/add",
-    description="ONLY FOR SUPERUSER. Create new category.",
+    status_code=status.HTTP_201_CREATED,
+    description="Create new category.",
     dependencies=[Depends(current_superuser)],
 )
 async def create_category(
@@ -35,6 +36,7 @@ async def create_category(
 
 @router.get(
     "/all",
+    status_code=status.HTTP_200_OK,
     description="Get all categories, grouped by their types: INCOMES, EXPENSES, INVESTMENTS, SAVINGS.",
     dependencies=[Depends(current_user)],
 )
@@ -51,7 +53,8 @@ async def get_all_categories(
 
 @router.delete(
     "/delete/{id}",
-    description="ONLY FOR SUPERUSER. Delete the category.",
+    status_code=status.HTTP_200_OK,
+    description="Delete the category.",
     dependencies=[Depends(current_superuser)],
 )
 async def delete_category(
