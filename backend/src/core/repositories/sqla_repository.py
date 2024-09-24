@@ -12,29 +12,31 @@ class SQLAlchemyRepository(AbstractRepository):
         self.session = session
 
     async def add_one(self, data: dict) -> int:
-        query = insert(self.model).values(**data).returning(self.model.id)
-        result = await self.session.execute(query)
+        stmt = insert(self.model).values(**data).returning(self.model.id)
+        result = await self.session.execute(stmt)
         return result.scalar_one()
 
     async def add_multiple(self, data: list[dict]) -> list[int]:
-        query = insert(self.model).values(data).returning(self.model.id)
-        result = await self.session.execute(query)
+        stmt = insert(self.model).values(data).returning(self.model.id)
+        result = await self.session.execute(stmt)
         res = [row[0] for row in result.all()]
         return res
 
     async def edit_one(self, _id: int, data: dict) -> int | None:
-        query = update(self.model).values(**data).filter_by(id=_id).returning(self.model.id)
-        result = await self.session.execute(query)
+        stmt = (
+            update(self.model).values(**data).filter_by(id=_id).returning(self.model.id)
+        )
+        result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
     async def delete_one(self, _id: int) -> int | None:
-        query = delete(self.model).filter_by(id=_id).returning(self.model.id)
-        result = await self.session.execute(query)
+        stmt = delete(self.model).filter_by(id=_id).returning(self.model.id)
+        result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
     async def delete_multiple(self, ids: list[int]) -> list[int]:
-        query = delete(self.model).where(self.model.id.in_(ids)).returning(self.model.id)
-        result = await self.session.execute(query)
+        stmt = delete(self.model).where(self.model.id.in_(ids)).returning(self.model.id)
+        result = await self.session.execute(stmt)
         res = [row[0] for row in result.all()]
         return res
 

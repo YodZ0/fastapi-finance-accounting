@@ -1,3 +1,5 @@
+from typing import TYPE_CHECKING, Annotated
+
 from abc import ABC, abstractmethod
 from sqlalchemy.exc import (
     IntegrityError,
@@ -7,9 +9,12 @@ from sqlalchemy.exc import (
     DatabaseError,
 )
 
-from src.core.models import db_helper
+from src.core.models.database import db_helper
 
 from src.core.repositories.category import CategoriesRepository
+
+if TYPE_CHECKING:
+    from src.core.models.database import DataBaseHelper
 
 
 class IUnitOfWork(ABC):
@@ -32,8 +37,8 @@ class IUnitOfWork(ABC):
 
 
 class UnitOfWork(IUnitOfWork):
-    def __init__(self):
-        self.session_factory = db_helper.session_factory
+    def __init__(self, db: Annotated["DataBaseHelper", db_helper]):
+        self.session_factory = db.session_factory
 
     async def __aenter__(self):
         async with self.session_factory() as session:
