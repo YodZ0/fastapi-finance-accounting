@@ -1,12 +1,18 @@
 import contextlib
+from typing import Annotated, TYPE_CHECKING
 
-from src.core.models import db_helper, User
+from fastapi import Depends
+
+from src.core.models import User
 from src.core.auth.user_manager import UserManager
+from src.core.models.database import get_db_helper
 from src.core.schemas.user import UserCreate
 
 from src.api.dependencies.auth.user_manager import get_user_manager
 from src.api.dependencies.auth.users import get_users_db
 
+if TYPE_CHECKING:
+    from src.core.models.database import DataBaseHelper
 
 get_users_db_context = contextlib.asynccontextmanager(get_users_db)
 get_user_manager_context = contextlib.asynccontextmanager(get_user_manager)
@@ -31,6 +37,7 @@ async def create_user(
 
 
 async def create_superuser(
+    db_helper: Annotated["DataBaseHelper", Depends(get_db_helper)],
     username: str = default_username,
     email: str = default_email,
     password: str = default_password,
@@ -46,10 +53,9 @@ async def create_superuser(
         is_superuser=is_superuser,
         is_verified=is_verified,
     )
-    async with db_helper.session_factory() as session:
-        async with get_users_db_context(session) as user_db:
-            async with get_user_manager_context(user_db) as user_manager:
-                return await create_user(
-                    user_manager=user_manager,
-                    user_create=user_create,
-                )
+    async with get_users_db_context(db_helper) as user_db:
+        async with get_user_manager_context(user_db) as user_manager:
+            return await create_user(
+                user_manager=user_manager,
+                user_create=user_create,
+            )
