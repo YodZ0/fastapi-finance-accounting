@@ -3,10 +3,10 @@ from pydantic import BaseModel, ConfigDict
 
 
 class CategoryType(str, Enum):
-    EXPENSE = 'Expense'
-    INCOME = 'Income'
-    INVESTMENT = 'Investment'
-    SAVING = 'Saving'
+    EXPENSE: str = "EXPENSE"
+    INCOME: str = "INCOME"
+    INVESTMENT: str = "INVESTMENT"
+    SAVING: str = "SAVING"
 
 
 class CategoryBase(BaseModel):
