@@ -9,6 +9,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 MEDIA_DIR = BASE_DIR / "media"
 LOGS_DIR = BASE_DIR / "logs"
 
+if not MEDIA_DIR.exists():
+    MEDIA_DIR.mkdir(parents=True, exist_ok=True)
+
+if not LOGS_DIR.exists():
+    LOGS_DIR.mkdir(parents=True, exist_ok=True)
+
 
 class RunConfig(BaseModel):
     host: str = "127.0.0.1"
