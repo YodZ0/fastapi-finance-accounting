@@ -7,27 +7,24 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.api import router as api_router
 
 from src.core.config import settings
-from src.core.models import db_helper, Base
-
-
-async def create_tables():
-    async with db_helper.engine.begin() as connection:
-        await connection.run_sync(Base.metadata.create_all)
-
-
-async def delete_tables():
-    async with db_helper.engine.begin() as connection:
-        await connection.run_sync(Base.metadata.drop_all)
+from src.core.models.database import get_db_helper
+from src.loggers import get_logger
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    logger = get_logger(__name__)
+    db_helper = get_db_helper()
+
+    # from src.actions.create_superuser import create_superuser
+    # await create_superuser(db_helper)
+
     # startup
-    print("=========================== STAR APPLICATION ===========================")
+    logger.info("STAR APPLICATION")
     yield
     # shutdown
     await db_helper.dispose()
-    print("============================ DISPOSE ENGINE ============================")
+    logger.info("DISPOSE ENGINE")
 
 
 main_app = FastAPI(
