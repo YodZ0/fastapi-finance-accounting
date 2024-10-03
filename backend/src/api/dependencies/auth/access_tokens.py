@@ -13,9 +13,9 @@ logger = get_logger(__name__)
 
 
 async def get_access_tokens_db(
-    session: Annotated[
-        "AsyncSession",
-        Depends(db_helper.session_getter),
+    db_helper: Annotated[
+        "DataBaseHelper",
+        Depends(get_db_helper),
     ],
 ):
     async with db_helper.session_factory() as session:
