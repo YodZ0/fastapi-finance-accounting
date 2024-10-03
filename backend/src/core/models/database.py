@@ -41,10 +41,11 @@ class DataBaseHelper:
             yield session
 
 
-db_helper = DataBaseHelper(
-    url=str(settings.db.url),
-    echo=settings.db.echo,
-    echo_pool=settings.db.echo_pool,
-    max_overflow=settings.db.max_overflow,
-    pool_size=settings.db.pool_size,
-)
+def get_db_helper() -> DataBaseHelper:
+    return DataBaseHelper(
+        url=str(settings.db.url),
+        echo=settings.db.echo,
+        echo_pool=settings.db.echo_pool,
+        max_overflow=settings.db.max_overflow,
+        pool_size=settings.db.pool_size,
+    )
