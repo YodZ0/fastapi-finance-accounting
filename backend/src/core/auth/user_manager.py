@@ -5,9 +5,12 @@ from fastapi_users import BaseUserManager, UUIDIDMixin
 
 from src.core.config import settings
 from src.core.models import User
+from src.loggers import get_logger
 
 if TYPE_CHECKING:
     from fastapi import Request
+
+logger = get_logger(__name__)
 
 
 class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
@@ -19,7 +22,11 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
         user: User,
         request: Optional["Request"] = None,
     ):
-        print(f"User {user.id} has registered.")
+        logger.success(
+            "User {user_email} ({user_id}) has registered.",
+            user_email=user.email,
+            user_id=user.id,
+        )
 
     async def on_after_forgot_password(
         self,
@@ -27,7 +34,12 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
         token: str,
         request: Optional["Request"] = None,
     ):
-        print(f"User {user.id} has forgot their password. Reset token: {token}")
+        logger.info(
+            "User {user_email} ({user_id}) has forgot their password. Reset token: {token}",
+            user_email=user.email,
+            user_id=user.id,
+            token=token,
+        )
 
     async def on_after_request_verify(
         self,
@@ -35,4 +47,9 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
         token: str,
         request: Optional["Request"] = None,
     ):
-        print(f"Verification requested for user {user.id}. Verification token: {token}")
+        logger.success(
+            "Verification requested for user {user_email} ({user_id}). Verification token: {token}.",
+            user_email=user.email,
+            user_id=user.id,
+            token=token,
+        )

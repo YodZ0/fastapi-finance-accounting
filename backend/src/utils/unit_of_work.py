@@ -9,9 +9,9 @@ from sqlalchemy.exc import (
 
 from src.core.models.database import DataBaseHelper
 from src.core.repositories.category import CategoriesRepository
+from src.loggers import get_logger
 
-if TYPE_CHECKING:
-    from src.core.models.database import DataBaseHelper
+logger = get_logger(__name__)
 
 
 class IUnitOfWork(ABC):
@@ -45,11 +45,6 @@ class UnitOfWork(IUnitOfWork):
             return self
 
     async def __aexit__(self, exc_type, exc_value, traceback) -> None:
-        if exc_type is None:
-            await self.commit()
-        else:
-            await self.rollback()
-        await self.session.close()
         try:
             if exc_type is None:
                 await self.commit()
@@ -58,36 +53,39 @@ class UnitOfWork(IUnitOfWork):
         finally:
             if self.session:
                 await self.session.close()
+                logger.debug("UOW: Session CLOSED")
 
     async def commit(self):
         try:
             if self.session:
                 await self.session.commit()
+                logger.debug("UOW: Session COMMIT")
         except IntegrityError as e:
             await self.rollback()
-            print(f"IntegrityError occurred: {e}")
+            logger.warning("UOW: IntegrityError occurred: {ex}", ex=e)
             raise
         except OperationalError as e:
             await self.rollback()
-            print(f"OperationalError occurred: {e}")
+            logger.warning("UOW: OperationalError occurred: {ex}", ex=e)
             raise
         except DataError as e:
             await self.rollback()
-            print(f"DataError occurred: {e}")
+            logger.warning("UOW: DataError occurred: {ex}", ex=e)
             raise
         except ProgrammingError as e:
             await self.rollback()
-            print(f"ProgrammingError occurred: {e}")
+            logger.warning("UOW: ProgrammingError occurred: {ex}", ex=e)
             raise
         except DatabaseError as e:
             await self.rollback()
-            print(f"DatabaseError occurred: {e}")
+            logger.warning("UOW: DatabaseError occurred: {ex}", ex=e)
             raise
         except Exception as e:
             await self.rollback()
-            print(f"An unexpected error occurred: {e}")
+            logger.warning("UOW: An unexpected error occurred: {ex}", ex=e)
             raise
 
     async def rollback(self):
         if self.session:
             await self.session.rollback()
+            logger.debug("UOW: Session ROLLED BACK")
