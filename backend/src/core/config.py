@@ -7,6 +7,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 MEDIA_DIR = BASE_DIR / "media"
+LOGS_DIR = BASE_DIR / "logs"
 
 
 class RunConfig(BaseModel):
@@ -53,6 +54,20 @@ class AccessTokenConfig(BaseModel):
     verification_token_secret: str
 
 
+class LoggingConfig(BaseModel):
+    path: Path = LOGS_DIR
+    format: str = "{time:YYYY-MM-DD HH:mm:ss} | {level} | {module}:{line} - {message}"
+    levels: tuple[str] = (
+        "DEBUG",
+        "INFO",
+        "SUCCESS",
+        "WARNING",
+        "ERROR",
+    )
+    rotation: str = "100 KB"
+    compression: str = "zip"
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         case_sensitive=False,
@@ -64,6 +79,7 @@ class Settings(BaseSettings):
     api: ApiPrefix = ApiPrefix()
     db: DataBaseConfig
     access_token: AccessTokenConfig
+    logs: LoggingConfig = LoggingConfig()
     base_dir: Path = BASE_DIR  # ..\fastapi-finance-accounting\backend\
     media_dir: Path = MEDIA_DIR  # ..\fastapi-finance-accounting\backend\media
 
