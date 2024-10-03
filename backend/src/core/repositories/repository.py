@@ -3,6 +3,10 @@ from abc import ABC, abstractmethod
 
 class AbstractRepository(ABC):
     @abstractmethod
+    def __init__(self, *args, **kwargs):
+        raise NotImplementedError
+
+    @abstractmethod
     async def add_one(self, *args, **kwargs):
         raise NotImplementedError
 
