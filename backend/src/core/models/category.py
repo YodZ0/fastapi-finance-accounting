@@ -1,5 +1,4 @@
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import Enum as PgEnum
 
 from src.core.models import Base
 from src.core.models.mixins import IntIdPkMixin
