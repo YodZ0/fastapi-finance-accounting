@@ -17,7 +17,6 @@ if TYPE_CHECKING:
 get_users_db_context = contextlib.asynccontextmanager(get_users_db)
 get_user_manager_context = contextlib.asynccontextmanager(get_user_manager)
 
-default_username = "admin"
 default_email = "admin@admin.com"
 default_password = "admin"
 default_is_active = True
@@ -38,7 +37,6 @@ async def create_user(
 
 async def create_superuser(
     db_helper: Annotated["DataBaseHelper", Depends(get_db_helper)],
-    username: str = default_username,
     email: str = default_email,
     password: str = default_password,
     is_active: bool = default_is_active,
@@ -46,7 +44,6 @@ async def create_superuser(
     is_verified: bool = default_is_verified,
 ):
     user_create = UserCreate(
-        username=username,
         email=email,
         password=password,
         is_active=is_active,
