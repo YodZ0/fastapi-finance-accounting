@@ -18,7 +18,7 @@ async def test_periods_add_router(aclient: AsyncClient, user_token: str):
 
     assert response.status_code == 201
     assert data.get("message") == "success"
-    assert data.get("data").get("new_period_id") == 1
+    assert data.get("data").get("new_period_id") == 2
 
 
 @pytest.mark.asyncio(loop_scope="session")
@@ -39,3 +39,27 @@ async def test_periods_get_all_router(aclient: AsyncClient, user_token: str):
     assert first.get("name") == "October"
     assert first.get("start") == "2024-01-01"
     assert first.get("end") == "2024-01-31"
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_periods_delete_router(aclient: AsyncClient, user_token: str):
+    period_id = 2
+
+    response = await aclient.delete(
+        f"/periods/delete/{period_id}",
+        headers={"Authorization": user_token},
+    )
+    data = response.json()
+
+    assert response.status_code == 200
+    assert data.get("message") == "success"
+    assert data.get("data").get("deleted_id") == 2
+
+    period_id = 3
+
+    response = await aclient.delete(
+        f"/periods/delete/{period_id}",
+        headers={"Authorization": user_token},
+    )
+
+    assert response.status_code == 404
