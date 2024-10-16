@@ -8,7 +8,6 @@ class PeriodBase(BaseModel):
     start: datetime.date
     end: datetime.date
     name: str
-    user_id: uuid.UUID
 
 
 class PeriodCreate(PeriodBase):
@@ -19,3 +18,4 @@ class Period(PeriodBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    user_id: uuid.UUID
