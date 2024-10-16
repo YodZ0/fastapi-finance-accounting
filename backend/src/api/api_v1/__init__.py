@@ -6,6 +6,7 @@ from src.core.config import settings
 from src.api.api_v1.auth import router as auth_router
 from src.api.api_v1.users import router as users_router
 from src.api.api_v1.category import router as category_router
+from src.api.api_v1.period import router as period_router
 
 http_bearer = HTTPBearer(auto_error=False)
 
@@ -32,4 +33,9 @@ router.include_router(
     category_router,
     prefix=settings.api.v1.categories,
     tags=["Categories"],
+)
+router.include_router(
+    period_router,
+    prefix=settings.api.v1.periods,
+    tags=["Periods"],
 )
