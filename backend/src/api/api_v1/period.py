@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi.responses import JSONResponse
 
 from sqlalchemy.exc import IntegrityError
 
@@ -47,6 +48,33 @@ async def get_all_user_periods(
     try:
         periods_dict = await PeriodService().get_all_user_periods(uow, user)
         return {"message": "success", "data": periods_dict}
+    except Exception as e:
+        logger.error("API: Unexpected error occurred: {ex}", ex=e)
+        raise HTTPException(status_code=500, detail="Internal server error.")
+
+
+@router.delete(
+    "/delete/{period_id}",
+    status_code=status.HTTP_200_OK,
+    description="Delete the period.",
+)
+async def delete_period(
+    period_id: int,
+    uow=Depends(get_uow),
+    user=Depends(current_user),
+):
+    try:
+        deleted_id = await PeriodService().delete_period(uow, period_id, user)
+
+        if deleted_id is not None:
+            return {"message": "success", "data": deleted_id}
+
+        return JSONResponse(
+            status_code=404,
+            content="Object not found.",
+        )
+    except IntegrityError:
+        raise HTTPException(status_code=400, detail="IntegrityError")
     except Exception as e:
         logger.error("API: Unexpected error occurred: {ex}", ex=e)
         raise HTTPException(status_code=500, detail="Internal server error.")
