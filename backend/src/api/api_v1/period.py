@@ -40,7 +40,7 @@ async def create_period(
     status_code=status.HTTP_200_OK,
     description="Get all user periods.",
 )
-async def get_all_categories(
+async def get_all_user_periods(
     uow=Depends(get_uow),
     user=Depends(current_user),
 ):
