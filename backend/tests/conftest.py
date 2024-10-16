@@ -59,7 +59,6 @@ async def user_token(aclient: AsyncClient):
         "is_active": True,
         "is_superuser": False,
         "is_verified": False,
-        "username": "Antonio Banderas",
     }
 
     register_response = await aclient.post("/auth/register", json=new_user)
@@ -92,7 +91,6 @@ async def admin_token(aclient: AsyncClient):
         "is_active": True,
         "is_superuser": True,
         "is_verified": True,
-        "username": "Admin",
     }
 
     admin_user = await create_superuser(test_db_helper, **new_admin)
