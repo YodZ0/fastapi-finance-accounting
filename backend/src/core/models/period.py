@@ -15,4 +15,5 @@ class ORMPeriod(IntIdPkMixin, Base):
 
     user_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
     )
