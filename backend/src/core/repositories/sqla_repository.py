@@ -66,7 +66,7 @@ class SQLAlchemyRepository(AbstractRepository):
             for field in related_fields:
                 query = query.options(joinedload(field))
         result = await self.session.execute(query)
-        res = [res[0] for res in result.all()]
+        res = result.scalars().all()
         return res
 
     async def get_all_filtered(self, *, load_options: bool = False, **filters):
@@ -83,4 +83,5 @@ class SQLAlchemyRepository(AbstractRepository):
                     query = query.where(getattr(self.model, key) == value)
 
         result = await self.session.execute(query)
-        return result.all()
+        res = result.scalars().all()
+        return res
