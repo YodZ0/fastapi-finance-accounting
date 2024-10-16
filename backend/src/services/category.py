@@ -23,30 +23,30 @@ class CategoryService:
     @staticmethod
     async def get_all_categories(
         uow: UnitOfWork,
-    ) -> dict[str, dict[str, list[str]]]:
+    ) -> dict[str, dict[str, list[tuple[int, str]]]]:
         try:
             async with uow:
+                category_map = {
+                    "INCOME": [],
+                    "EXPENSE": [],
+                    "INVESTMENT": [],
+                    "SAVING": [],
+                    "REMAINS": [],
+                }
                 categories: list[Category] = await uow.categories.get_all()
-                incomes_list = []
-                expenses_list = []
-                investments_list = []
-                savings_list = []
+
                 for category in categories:
-                    if category.type == "INCOME":
-                        incomes_list.append(category.name)
-                    if category.type == "EXPENSE":
-                        expenses_list.append(category.name)
-                    if category.type == "INVESTMENT":
-                        investments_list.append(category.name)
-                    if category.type == "SAVING":
-                        savings_list.append(category.name)
+                    cat = Category.model_validate(category)
+                    if cat.type in category_map:
+                        category_map[cat.type].append((cat.id, cat.name))
 
                 result = {
                     "categories": {
-                        "incomes": incomes_list,
-                        "expenses": expenses_list,
-                        "investments": investments_list,
-                        "savings": savings_list,
+                        "incomes": category_map["INCOME"],
+                        "expenses": category_map["EXPENSE"],
+                        "investments": category_map["INVESTMENT"],
+                        "savings": category_map["SAVING"],
+                        "remains": category_map["REMAINS"],
                     }
                 }
                 return result
