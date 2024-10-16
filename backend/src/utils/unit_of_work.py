@@ -9,6 +9,7 @@ from sqlalchemy.exc import (
 
 from src.core.models.database import DataBaseHelper
 from src.core.repositories.category import CategoriesRepository
+from src.core.repositories.period import PeriodsRepository
 from src.loggers import get_logger
 
 logger = get_logger(__name__)
@@ -16,6 +17,7 @@ logger = get_logger(__name__)
 
 class IUnitOfWork(ABC):
     categories: CategoriesRepository
+    periods: PeriodsRepository
 
     @abstractmethod
     def __init__(self): ...
@@ -42,6 +44,7 @@ class UnitOfWork(IUnitOfWork):
         async with self.session_factory() as session:
             self.session = session
             self.categories = CategoriesRepository(self.session)
+            self.periods = PeriodsRepository(self.session)
             return self
 
     async def __aexit__(self, exc_type, exc_value, traceback) -> None:
