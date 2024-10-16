@@ -7,6 +7,7 @@ class CategoryType(str, Enum):
     INCOME: str = "INCOME"
     INVESTMENT: str = "INVESTMENT"
     SAVING: str = "SAVING"
+    REMAINS: str = "REMAINS"
 
 
 class CategoryBase(BaseModel):
