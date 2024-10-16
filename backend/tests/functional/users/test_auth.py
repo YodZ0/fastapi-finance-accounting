@@ -10,7 +10,6 @@ async def test_register_user(aclient: AsyncClient):
         "is_active": True,
         "is_superuser": False,
         "is_verified": False,
-        "username": "Test dummy",
     }
     response = await aclient.post("/auth/register", json=new_user)
     data = response.json()
