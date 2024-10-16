@@ -49,6 +49,16 @@ class SQLAlchemyRepository(AbstractRepository):
         result = await self.session.execute(query)
         return result.scalar_one_or_none()
 
+    async def get_one_filtered(self, **filters):
+        query = select(self.model)
+
+        for key, value in filters.items():
+            if value is not None and hasattr(self.model, key):
+                query = query.where(getattr(self.model, key) == value)
+
+        result = await self.session.execute(query)
+        return result.scalar_one_or_none()
+
     async def get_all(self, *, load_related: bool = False):
         query = select(self.model)
         if load_related:
