@@ -1,8 +1,8 @@
 """initial
 
-Revision ID: fcef3c4e79a5
+Revision ID: cd92b3710e1f
 Revises: 
-Create Date: 2024-09-23 10:08:18.307488
+Create Date: 2024-10-07 03:55:02.891669
 
 """
 
@@ -14,7 +14,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "fcef3c4e79a5"
+revision: str = "cd92b3710e1f"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -23,7 +23,7 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     op.create_table(
         "orm_categories",
-        sa.Column("id", sa.Integer(), nullable=False),
+        sa.PrimaryKeyConstraint("id", name=op.f("pk_orm_categories")),
         sa.Column("name", sa.String(), nullable=False),
         sa.Column(
             "type",
@@ -32,11 +32,12 @@ def upgrade() -> None:
                 "INCOME",
                 "INVESTMENT",
                 "SAVING",
-                name="category_type",
+                "REMAINS",
+                name="categorytype",
             ),
             nullable=False,
         ),
-        sa.PrimaryKeyConstraint("id", name=op.f("pk_orm_categories")),
+        sa.Column("id", sa.Integer(), nullable=False),
         sa.UniqueConstraint("name", name=op.f("uq_orm_categories_name")),
     )
     op.create_index(
@@ -45,7 +46,6 @@ def upgrade() -> None:
     op.create_table(
         "users",
         sa.Column("id", fastapi_users_db_sqlalchemy.generics.GUID(), nullable=False),
-        sa.Column("username", sa.String(length=320), nullable=False),
         sa.Column("email", sa.String(length=320), nullable=False),
         sa.Column("hashed_password", sa.String(length=1024), nullable=False),
         sa.Column("created_at", sa.Date(), nullable=False),
