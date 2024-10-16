@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi.responses import JSONResponse
 
 from sqlalchemy.exc import IntegrityError
 
@@ -67,10 +68,13 @@ async def delete_category(
     try:
         deleted_id = await CategoryService().delete_category(uow, cat_id)
 
-        if deleted_id.get("deleted_id"):
+        if deleted_id is not None:
             return {"message": "success", "data": deleted_id}
 
-        raise HTTPException(status_code=404, detail="Object not found.")
+        return JSONResponse(
+            status_code=404,
+            content="Object not found.",
+        )
     except Exception as e:
         logger.error("API: Unexpected error occurred: {ex}", ex=e)
         raise HTTPException(status_code=500, detail="Internal server error.")
