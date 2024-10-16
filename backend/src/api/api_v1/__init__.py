@@ -7,6 +7,7 @@ from src.api.api_v1.auth import router as auth_router
 from src.api.api_v1.users import router as users_router
 from src.api.api_v1.category import router as category_router
 from src.api.api_v1.period import router as period_router
+from src.api.api_v1.operation import router as operation_router
 
 http_bearer = HTTPBearer(auto_error=False)
 
@@ -38,4 +39,9 @@ router.include_router(
     period_router,
     prefix=settings.api.v1.periods,
     tags=["Periods"],
+)
+router.include_router(
+    operation_router,
+    prefix=settings.api.v1.operations,
+    tags=["Operations"],
 )

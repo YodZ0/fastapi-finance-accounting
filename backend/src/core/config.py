@@ -27,6 +27,7 @@ class ApiV1Prefix(BaseModel):
     users: str = "/users"
     categories: str = "/categories"
     periods: str = "/periods"
+    operations: str = "/operations"
 
 
 class ApiPrefix(BaseModel):
