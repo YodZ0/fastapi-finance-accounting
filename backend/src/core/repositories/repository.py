@@ -19,7 +19,7 @@ class AbstractRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_by_id(self, *args, **kwargs):
+    async def get_one_by_pk(self, *args, **kwargs):
         raise NotImplementedError
 
     @abstractmethod
@@ -27,5 +27,5 @@ class AbstractRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_all_filtered(self, *args, **kwargs):
+    async def get_filtered(self, *args, **kwargs):
         raise NotImplementedError
