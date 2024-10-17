@@ -16,7 +16,7 @@ class OperationService:
         operation_dict["user_id"] = user.id
         try:
             async with uow:
-                new_operation_id = await uow.operations.add_one(data=operation_dict)
+                new_operation_id = await uow.operations.add_one(**operation_dict)
                 return {"new_operation_id": new_operation_id}
         except IntegrityError:
             raise
@@ -30,7 +30,7 @@ class OperationService:
     ) -> dict[str, list[Operation]]:
         try:
             async with uow:
-                operations: list[Operation] = await uow.operations.get_all_filtered(
+                operations: list[Operation] = await uow.operations.get_filtered(
                     user_id=user.id,
                 )
                 result = [
@@ -50,14 +50,13 @@ class OperationService:
     ) -> dict[str, int] | None:
         try:
             async with uow:
-                operation: Operation = await uow.operations.get_one_filtered(
-                    id=operation_id,
-                    user=user.id,
-                )
+                operation = await uow.operations.get_one_by_pk(pk=operation_id)
                 if operation:
-                    deleted_operation_id = await uow.operations.delete_one(
-                        _id=operation.id
-                    )
+                    operation = Operation.model_validate(operation)
+                    if operation.user_id == user.id:
+                        deleted_operation_id = await uow.operations.delete_one(
+                            pk=operation_id
+                        )
                     return {"deleted_id": deleted_operation_id}
                 else:
                     return None

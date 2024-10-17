@@ -13,7 +13,7 @@ class CategoryService:
         category_dict = new_category.model_dump()
         try:
             async with uow:
-                new_category_id = await uow.categories.add_one(data=category_dict)
+                new_category_id = await uow.categories.add_one(**category_dict)
                 return {"new_category_id": new_category_id}
         except IntegrityError:
             raise
@@ -61,7 +61,7 @@ class CategoryService:
     ) -> dict[str, int] | None:
         try:
             async with uow:
-                deleted_cat_id = await uow.categories.delete_one(_id=cat_id)
+                deleted_cat_id = await uow.categories.delete_one(pk=cat_id)
                 return {"deleted_id": deleted_cat_id}
         except Exception:
             raise

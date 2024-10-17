@@ -16,7 +16,7 @@ class PeriodService:
         period_dict["user_id"] = user.id
         try:
             async with uow:
-                new_period_id = await uow.periods.add_one(data=period_dict)
+                new_period_id = await uow.periods.add_one(**period_dict)
                 return {"new_period_id": new_period_id}
         except IntegrityError:
             raise
@@ -30,9 +30,7 @@ class PeriodService:
     ) -> dict[str, list[Period]]:
         try:
             async with uow:
-                periods: list[Period] = await uow.periods.get_all_filtered(
-                    user_id=user.id,
-                )
+                periods: list = await uow.periods.get_filtered(user_id=user.id)
                 result = [Period.model_validate(period) for period in periods]
                 return {"periods": result}
         except IntegrityError:
@@ -48,13 +46,12 @@ class PeriodService:
     ) -> dict[str, int] | None:
         try:
             async with uow:
-                period: Period = await uow.periods.get_one_filtered(
-                    id=period_id,
-                    user=user.id,
-                )
+                period = await uow.periods.get_one_by_pk(pk=period_id)
                 if period:
-                    deleted_period_id = await uow.periods.delete_one(_id=period.id)
-                    return {"deleted_id": deleted_period_id}
+                    period = Period.model_validate(period)
+                    if period.user_id == user.id:
+                        deleted_period_id = await uow.periods.delete_one(pk=period_id)
+                        return {"deleted_id": deleted_period_id}
                 else:
                     return None
         except Exception:
