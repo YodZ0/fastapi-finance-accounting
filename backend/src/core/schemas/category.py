@@ -5,9 +5,7 @@ from pydantic import BaseModel, ConfigDict
 class CategoryType(str, Enum):
     EXPENSE: str = "EXPENSE"
     INCOME: str = "INCOME"
-    INVESTMENT: str = "INVESTMENT"
     SAVING: str = "SAVING"
-    REMAINS: str = "REMAINS"
 
 
 class CategoryBase(BaseModel):
